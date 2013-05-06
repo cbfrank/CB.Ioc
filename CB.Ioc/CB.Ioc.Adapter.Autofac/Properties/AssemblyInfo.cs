@@ -6,10 +6,10 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CB.Ioc")]
+[assembly: AssemblyTitle("CB.Ioc.Adapter.Autofac")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("CB.Ioc")]
+[assembly: AssemblyProduct("CB.Ioc.Adapter.Autofac")]
 [assembly: AssemblyCopyright("Copyright © CB 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

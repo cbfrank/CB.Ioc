@@ -53,28 +53,28 @@ namespace CB.Ioc
         private class TmpRegisterTypeInfo
         {
             public Type Type { get; set; }
-            public TypeInjectionAttribute[] Attrs { get; set; }
+            public TypeInjectionAttribute[] Attributes { get; set; }
         }
 
         public static void RegisterTypes(this IContainerBuilder builder, bool forceTypeInjectionAttribute = true, params Type[] typesArray)
         {
             var types = from t in typesArray
-                        let attrs = t.GetCustomAttributes(typeof(TypeInjectionAttribute), false)
-                        where (!forceTypeInjectionAttribute) || (attrs != null && attrs.Any())
+                        let attributes = t.GetCustomAttributes(typeof(TypeInjectionAttribute), false)
+                        where (!forceTypeInjectionAttribute) || (attributes != null && attributes.Any())
                         select new TmpRegisterTypeInfo
                         {
                             Type = t,
-                            Attrs = attrs == null ? new TypeInjectionAttribute[0] : attrs.Cast<TypeInjectionAttribute>().ToArray()
+                            Attributes = attributes == null ? new TypeInjectionAttribute[0] : attributes.Cast<TypeInjectionAttribute>().ToArray()
                         };
             foreach (var type in types)
             {
                 //if no RegisterInfo is specified, means register it self
-                if (type.Attrs == null || type.Attrs.Length <= 0)
+                if (type.Attributes == null || type.Attributes.Length <= 0)
                 {
-                    type.Attrs = new[] { new TypeInjectionAttribute() };
+                    type.Attributes = new[] { new TypeInjectionAttribute() };
                 }
 
-                foreach (var attribute in type.Attrs)
+                foreach (var attribute in type.Attributes)
                 {
                     var reg = builder.Register(type.Type);
                     if (attribute != null)
@@ -107,6 +107,78 @@ namespace CB.Ioc
         public static void RegisterAssemblyTypes(this IContainerBuilder builder, Assembly assembly, bool forceTypeInjectionAttribute = true)
         {
             RegisterTypes(builder, forceTypeInjectionAttribute, assembly.GetTypes());
+        }
+
+        public static bool TryResolve(this IContainer container, Type resolvedType, string name, out object instance)
+        {
+            instance = null;
+            if (!container.CanResolve(resolvedType, name))
+            {
+                return false;
+            }
+            instance = container.Resolve(resolvedType, name);
+            return true;
+        }
+
+        public static bool TryResolve(this IContainer container, Type resolvedType, out object instance)
+        {
+            return TryResolve(container, resolvedType, null, out instance);
+        }
+
+        public static void PropertyInjection(this IContainer container, object instance, Type attributeType, Func<object, PropertyInfo, IEnumerable<object>, Type> overrideTypeResolveFunc)
+        {
+            if (!attributeType.IsSubclassOf(typeof(Attribute)))
+            {
+                //ToDO Message
+                throw new ArgumentOutOfRangeException("", "attributeType");
+            }
+            var properties = from p in instance.GetType().GetProperties()
+                             where p.CanWrite && p.GetIndexParameters().Length <= 0
+                             let attributes = p.GetCustomAttributes(attributeType, true)
+                             where attributes.Length > 0
+                             select new
+                             {
+                                 PropertyInfo = p,
+                                 Attributes = attributes
+                             };
+            foreach (var prop in properties)
+            {
+                var value = prop.PropertyInfo.GetValue(instance, null);
+                if (value != null)
+                {
+                    continue;
+                }
+                value = null;
+                var overrideTypeResolve = prop.PropertyInfo.PropertyType;
+                if (overrideTypeResolveFunc != null)
+                {
+                    overrideTypeResolve = overrideTypeResolveFunc(instance, prop.PropertyInfo, prop.Attributes);
+                }
+                if (!prop.PropertyInfo.PropertyType.IsAssignableFrom(overrideTypeResolve))
+                {
+                    throw new ArgumentException(
+                        string.Format("overrideTypeResolve should be able to assigned to property {0}.{1}",
+                                      prop.PropertyInfo.Name, instance.GetType().FullName), "overrideTypeResolve");
+                }
+                if (!TryResolve(container, overrideTypeResolve, out value))
+                {
+                    continue;
+                }
+                if (value != null)
+                {
+                    prop.PropertyInfo.SetValue(instance, value, null);
+                }
+            }
+        }
+
+        public static void PropertyInjection<TAttr>(this IContainer container, object instance,
+                                                       Func<object, PropertyInfo, IEnumerable<TAttr>, Type> overrideTypeResolveFunc)
+            where TAttr : Attribute
+        {
+            PropertyInjection(
+                container, instance, typeof (TAttr),
+                (ins, propertyInfo, attributes) =>
+                overrideTypeResolveFunc(ins, propertyInfo, attributes.Cast<TAttr>()));
         }
     }
 }
