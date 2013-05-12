@@ -7,11 +7,17 @@ namespace CB.Ioc.Adapter.Autofac
     public class AutofacBuilder : IContainerBuilder
     {
         public AutofacBuilder()
+            : this(new ContainerBuilder())
         {
-            Builder = new ContainerBuilder();
+
         }
 
-        protected ContainerBuilder Builder { get; private set; }
+        public AutofacBuilder(ContainerBuilder builder)
+        {
+            Builder = builder;
+        }
+
+        public ContainerBuilder Builder { get; private set; }
 
         public IRegisterOption Register(Type implementationType)
         {
