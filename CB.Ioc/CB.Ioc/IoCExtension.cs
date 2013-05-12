@@ -120,9 +120,22 @@ namespace CB.Ioc
             return true;
         }
 
+        public static bool TryResolve<T>(this IContainer container, string name, out T instance) where T : class
+        {
+            object obj;
+            var result= TryResolve(container, typeof (T), name, out obj);
+            instance = (T) obj;
+            return result;
+        }
+
         public static bool TryResolve(this IContainer container, Type resolvedType, out object instance)
         {
             return TryResolve(container, resolvedType, null, out instance);
+        }
+
+        public static bool TryResolve<T>(this IContainer container, out T instance) where T : class
+        {
+            return TryResolve(container, null, out instance);
         }
 
         public static void PropertyInjection(this IContainer container, object instance, Type attributeType, Func<object, PropertyInfo, IEnumerable<object>, Type> overrideTypeResolveFunc)
@@ -157,8 +170,8 @@ namespace CB.Ioc
                 if (!prop.PropertyInfo.PropertyType.IsAssignableFrom(overrideTypeResolve))
                 {
                     throw new ArgumentException(
-                        string.Format("overrideTypeResolve should be able to assigned to property {0}.{1}",
-                                      prop.PropertyInfo.Name, instance.GetType().FullName), "overrideTypeResolve");
+                        string.Format("the return value of overrideTypeResolveFunc should be able to assigned to property {0}.{1}",
+                                      prop.PropertyInfo.Name, instance.GetType().FullName), "overrideTypeResolveFunc");
                 }
                 if (!TryResolve(container, overrideTypeResolve, out value))
                 {
