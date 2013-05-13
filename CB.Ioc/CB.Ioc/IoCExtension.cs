@@ -32,19 +32,25 @@ namespace CB.Ioc
             return container.CanResolve(typeof(T), name);
         }
 
-        public static TResolveType Resolve<TResolveType>(this IContainer container, string name = null)
+        public static TResolveType Resolve<TResolveType>(this IContainer container, string name, params IResolveParameter[] parameters)
             where TResolveType : class
         {
             if (container.CanResolve<TResolveType>(name))
             {
-                return (TResolveType) (container.Resolve(typeof (TResolveType), name));
+                return (TResolveType) (container.Resolve(typeof (TResolveType), name, parameters));
             }
             return default(TResolveType);
         }
 
-        public static IEnumerable<TResolveType> ResolveAll<TResolveType>(this IContainer container)
+        public static TResolveType Resolve<TResolveType>(this IContainer container, params IResolveParameter[] parameters)
+            where TResolveType : class
         {
-            foreach (var instance in container.ResolveAll(typeof (TResolveType)))
+            return Resolve<TResolveType>(container, null, parameters);
+        }
+
+        public static IEnumerable<TResolveType> ResolveAll<TResolveType>(this IContainer container, params IResolveParameter[] parameters)
+        {
+            foreach (var instance in container.ResolveAll(typeof (TResolveType), parameters))
             {
                 yield return (TResolveType) instance;
             }

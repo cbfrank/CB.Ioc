@@ -38,6 +38,7 @@
     <Compile Include="AutofacBuilder.cs" />
     <Compile Include="AutofacContainer.cs" />
     <Compile Include="AutofacRegisterOption.cs" />
+    <Compile Include="AutofacResolvedParameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

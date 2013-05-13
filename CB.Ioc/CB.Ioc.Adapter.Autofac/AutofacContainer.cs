@@ -2,9 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using Autofac;
+using Autofac.Core;
 
 namespace CB.Ioc.Adapter.Autofac
 {
@@ -34,17 +33,25 @@ namespace CB.Ioc.Adapter.Autofac
             Dispose(false);
         }
 
-        public object Resolve(Type resolveType, string name = null)
+        public object Resolve(Type resolveType, string name, params IResolveParameter[] parameters)
         {
-            var instance = string.IsNullOrEmpty(name) ? ComponentContext.Resolve(resolveType) : ComponentContext.ResolveNamed(name, resolveType);
+            var instance = ComponentContext.ResolveNamed(name, resolveType, parameters.Select(p => new AutofacResolvedParameter(p)));
             BuildUp(instance);
             return instance;
         }
 
-        public IEnumerable ResolveAll(Type resolveType)
+        public object Resolve(Type resolveType, params IResolveParameter[] parameters)
         {
-            var type = typeof (IEnumerable<>);
-            foreach (var instance in (IEnumerable) ComponentContext.Resolve(type.MakeGenericType(resolveType)))
+            var instance = ComponentContext.Resolve(resolveType, parameters.Select(p => new AutofacResolvedParameter(p)));
+            BuildUp(instance);
+            return instance;
+        }
+
+        public IEnumerable ResolveAll(Type resolveType, params IResolveParameter[] parameters)
+        {
+            var type = typeof(IEnumerable<>);
+            var @params = parameters.Select(p => (Parameter)new AutofacResolvedParameter(p)).ToArray();
+            foreach (var instance in (IEnumerable) ComponentContext.Resolve(type.MakeGenericType(resolveType), @params))
             {
                 BuildUp(instance);
                 yield return instance;
