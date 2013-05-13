@@ -45,7 +45,11 @@ namespace CB.Ioc
         public static TResolveType Resolve<TResolveType>(this IContainer container, params IResolveParameter[] parameters)
             where TResolveType : class
         {
-            return Resolve<TResolveType>(container, null, parameters);
+            if (container.CanResolve<TResolveType>())
+            {
+                return (TResolveType)(container.Resolve(typeof(TResolveType), parameters));
+            }
+            return default(TResolveType);
         }
 
         public static IEnumerable<TResolveType> ResolveAll<TResolveType>(this IContainer container, params IResolveParameter[] parameters)
