@@ -45,11 +45,7 @@ namespace CB.Ioc
         public static TResolveType Resolve<TResolveType>(this IContainer container, params IResolveParameter[] parameters)
             where TResolveType : class
         {
-            if (container.CanResolve<TResolveType>())
-            {
-                return (TResolveType)(container.Resolve(typeof(TResolveType), parameters));
-            }
-            return default(TResolveType);
+            return Resolve<TResolveType>(container, null, parameters);
         }
 
         public static IEnumerable<TResolveType> ResolveAll<TResolveType>(this IContainer container, params IResolveParameter[] parameters)
@@ -119,33 +115,40 @@ namespace CB.Ioc
             RegisterTypes(builder, forceTypeInjectionAttribute, assembly.GetTypes());
         }
 
-        public static bool TryResolve(this IContainer container, Type resolvedType, string name, out object instance)
+        public static bool TryResolve(this IContainer container, Type resolvedType, string name, out object instance, params IResolveParameter[] parameters)
         {
             instance = null;
             if (!container.CanResolve(resolvedType, name))
             {
                 return false;
             }
-            instance = container.Resolve(resolvedType, name);
+            if (string.IsNullOrEmpty(name))
+            {
+                instance = container.Resolve(resolvedType, parameters);
+            }
+            else
+            {
+                instance = container.Resolve(resolvedType, name, parameters);
+            }
             return true;
         }
 
-        public static bool TryResolve<T>(this IContainer container, string name, out T instance) where T : class
+        public static bool TryResolve(this IContainer container, Type resolvedType, out object instance, params IResolveParameter[] parameters)
+        {
+            return TryResolve(container, resolvedType, null, out instance, parameters);
+        }
+
+        public static bool TryResolve<T>(this IContainer container, string name, out T instance, params IResolveParameter[] parameters) where T : class
         {
             object obj;
-            var result= TryResolve(container, typeof (T), name, out obj);
-            instance = (T) obj;
+            var result = TryResolve(container, typeof (T), name, out obj, parameters);
+            instance = (T)obj;
             return result;
         }
 
-        public static bool TryResolve(this IContainer container, Type resolvedType, out object instance)
+        public static bool TryResolve<T>(this IContainer container, out T instance, params IResolveParameter[] parameters) where T : class
         {
-            return TryResolve(container, resolvedType, null, out instance);
-        }
-
-        public static bool TryResolve<T>(this IContainer container, out T instance) where T : class
-        {
-            return TryResolve(container, null, out instance);
+            return TryResolve(container, null, out instance, parameters);
         }
 
         public static void PropertyInjection(this IContainer container, object instance, Type attributeType, Func<object, PropertyInfo, IEnumerable<object>, Type> overrideTypeResolveFunc)

@@ -35,16 +35,23 @@ namespace CB.Ioc.Adapter.Autofac
 
         public object Resolve(Type resolveType, string name, params IResolveParameter[] parameters)
         {
-            var instance = ComponentContext.ResolveNamed(name, resolveType, parameters.Select(p => new AutofacResolvedParameter(p)));
+            object instance;
+            var @params = parameters.Select(p => (Parameter) new AutofacResolvedParameter(p)).ToArray();
+            if (string.IsNullOrEmpty(name))
+            {
+                instance = ComponentContext.Resolve(resolveType, @params);
+            }
+            else
+            {
+                instance = ComponentContext.ResolveNamed(name, resolveType, @params);
+            }
             BuildUp(instance);
             return instance;
         }
 
         public object Resolve(Type resolveType, params IResolveParameter[] parameters)
         {
-            var instance = ComponentContext.Resolve(resolveType, parameters.Select(p => new AutofacResolvedParameter(p)));
-            BuildUp(instance);
-            return instance;
+            return Resolve(resolveType, null, parameters);
         }
 
         public IEnumerable ResolveAll(Type resolveType, params IResolveParameter[] parameters)
