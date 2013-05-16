@@ -86,7 +86,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mvc\MvcDependencyResolver.cs" />
+    <Compile Include="Mvc\MvcExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebApi\WebApiExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CB.Ioc\CB.Ioc.csproj">
@@ -94,9 +96,7 @@
       <Name>CB.Ioc</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="WebApi\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

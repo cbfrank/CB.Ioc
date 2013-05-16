@@ -72,9 +72,10 @@ namespace CB.Ioc.Adapter.Autofac
 
         public virtual void BuildUp(object resolvedInstance)
         {
-            //we needn't do property injection
-            //because in AutofacRegisterOption
-            //we have already register this on "OnActived"
+            //although we have already register property injection this on "OnActived" of AutofacRegisterOption
+            //but we have do it again for some case that user directly build up an existing instance
+            //and as property injection won't inject for a property that have value so it is ok to run this twice
+            this.PropertyInjection<DependencyAttribute>(resolvedInstance, IoCExtension.DefaultOverrideTypeResolveFunc);
         }
     }
 }
