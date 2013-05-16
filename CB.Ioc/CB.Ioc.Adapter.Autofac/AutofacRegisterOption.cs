@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Autofac;
 using Autofac.Builder;
+using Autofac.Core;
 
 namespace CB.Ioc.Adapter.Autofac
 {
@@ -11,7 +13,14 @@ namespace CB.Ioc.Adapter.Autofac
         public AutofacRegisterOption(IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> registrationBuilder, Type asType)
         {
             FRegistrationBuilder = registrationBuilder;
+            FRegistrationBuilder.OnActivated(ActivedHandler);
             _AsType = asType;
+        }
+
+        private static void ActivedHandler(IActivatedEventArgs<TLimit> activatedEventArgs)
+        {
+            IoCExtension.PropertyInjection<DependencyAttribute>(
+                activatedEventArgs.Context.Resolve<IContainer>(), activatedEventArgs.Instance, IoCExtension.DefaultOverrideTypeResolveFunc);
         }
 
         protected IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> FRegistrationBuilder;

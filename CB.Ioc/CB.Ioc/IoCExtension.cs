@@ -206,5 +206,11 @@ namespace CB.Ioc
                 (ins, propertyInfo, attributes) =>
                 overrideTypeResolveFunc(ins, propertyInfo, attributes.Cast<TAttr>()));
         }
+
+        public static Type DefaultOverrideTypeResolveFunc(object instance, PropertyInfo propertyInfo, IEnumerable<DependencyAttribute> dependencyAttributes)
+        {
+            var t = dependencyAttributes.First().ResolveType;
+            return t ?? propertyInfo.PropertyType;
+        }
     }
 }

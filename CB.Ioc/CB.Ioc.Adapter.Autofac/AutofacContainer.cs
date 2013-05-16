@@ -54,7 +54,7 @@ namespace CB.Ioc.Adapter.Autofac
             return Resolve(resolveType, null, parameters);
         }
 
-        public IEnumerable ResolveAll(Type resolveType, params IResolveParameter[] parameters)
+        public IEnumerable<object> ResolveAll(Type resolveType, params IResolveParameter[] parameters)
         {
             var type = typeof(IEnumerable<>);
             var @params = parameters.Select(p => (Parameter)new AutofacResolvedParameter(p)).ToArray();
@@ -72,12 +72,9 @@ namespace CB.Ioc.Adapter.Autofac
 
         public virtual void BuildUp(object resolvedInstance)
         {
-            this.PropertyInjection<DependencyAttribute>(
-                resolvedInstance, (instance, propertyInfo, attributes) =>
-                    {
-                        var t = attributes.First().ResolveType;
-                        return t ?? propertyInfo.PropertyType;
-                    });
+            //we needn't do property injection
+            //because in AutofacRegisterOption
+            //we have already register this on "OnActived"
         }
     }
 }
