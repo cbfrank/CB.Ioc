@@ -10,12 +10,6 @@ namespace CB.Ioc
             SingleInstance = false;
         }
 
-        public TypeInjectionAttribute(object name)
-            : this()
-        {
-            Name = name.ToString();
-        }
-
         public string Name { get; set; }
         public Type AsType { get; set; }
         public bool SingleInstance { get; set; }
