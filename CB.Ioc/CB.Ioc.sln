@@ -1,16 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CB.Ioc", "CB.Ioc\CB.Ioc.csproj", "{DE5CD9FE-E9DF-432B-B2FA-5087D34616AE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CB.Ioc.Adapter.Autofac", "CB.Ioc.Adapter.Autofac\CB.Ioc.Adapter.Autofac.csproj", "{70653AFC-3E46-497B-8FEA-020CD23F9023}"
-EndProject
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{BA5CFA4F-315C-41A2-87E3-270CA2A109FF}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CB.Ioc", "CB.Ioc\CB.Ioc.csproj", "{DE5CD9FE-E9DF-432B-B2FA-5087D34616AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CB.Ioc.Adapter.Autofac", "CB.Ioc.Adapter.Autofac\CB.Ioc.Adapter.Autofac.csproj", "{70653AFC-3E46-497B-8FEA-020CD23F9023}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CB.Ioc.Asp.Net.Integration", "CB.Ioc.Asp.Net.Integration\CB.Ioc.Asp.Net.Integration.csproj", "{C6032995-9953-444F-9D9D-CD09D0A7E231}"
 EndProject
