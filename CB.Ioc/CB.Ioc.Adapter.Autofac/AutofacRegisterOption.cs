@@ -19,8 +19,7 @@ namespace CB.Ioc.Adapter.Autofac
 
         private static void ActivedHandler(IActivatedEventArgs<TLimit> activatedEventArgs)
         {
-            IoCExtension.PropertyInjection<DependencyAttribute>(
-                activatedEventArgs.Context.Resolve<IContainer>(), activatedEventArgs.Instance, IoCExtension.DefaultOverrideTypeResolveFunc);
+            activatedEventArgs.Context.Resolve<IContainer>().PropertyInjection<DependencyAttribute>(activatedEventArgs.Instance, IoCExtension.DefaultOverrideTypeResolveFunc);
         }
 
         protected IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> FRegistrationBuilder;
@@ -59,7 +58,10 @@ namespace CB.Ioc.Adapter.Autofac
 
         public IRegisterOption Name(string name)
         {
-            FRegistrationBuilder = FRegistrationBuilder.Named(name, _AsType);
+            if (!string.IsNullOrEmpty(name))
+            {
+                FRegistrationBuilder = FRegistrationBuilder.Named(name, _AsType);
+            }
             return this;
         }
     }
