@@ -46,6 +46,7 @@
     <Compile Include="IoCExtension.cs" />
     <Compile Include="IRegisterOption.cs" />
     <Compile Include="IResolveParameter.cs" />
+    <Compile Include="IScopeResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResolveParameters\NamedResolveParameter.cs" />
     <Compile Include="ResolveParameters\WeakRefNamedResolveParameter.cs" />

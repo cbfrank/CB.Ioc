@@ -40,7 +40,7 @@ namespace CB.Ioc.Adapter.Autofac
         {
             var c= new AutofacContainer();
             Builder.RegisterInstance(c).As<IContainer>();
-            c.ComponentContext = Builder.Build();
+            c.ContainerContext = Builder.Build();
             return c;
         }
 
@@ -50,7 +50,7 @@ namespace CB.Ioc.Adapter.Autofac
             {
                 throw new ArgumentException("The container should be AutofacContainer", "container");
             }
-            Builder.Update(((AutofacContainer) container).ComponentContext);
+            Builder.Update(((AutofacContainer)container).ContainerContext);
         }
     }
 }

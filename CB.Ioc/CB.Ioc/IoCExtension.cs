@@ -27,12 +27,12 @@ namespace CB.Ioc
             return builder.Register(instance).As(typeof (TReg)).Name(name);
         }
 
-        public static bool CanResolve<T>(this IContainer container, string name = null)
+        public static bool CanResolve<T>(this IScopeResolver container, string name = null)
         {
-            return container.CanResolve(typeof(T), name);
+            return container.CanResolve(typeof (T), name);
         }
 
-        public static TResolveType Resolve<TResolveType>(this IContainer container, string name, params IResolveParameter[] parameters)
+        public static TResolveType Resolve<TResolveType>(this IScopeResolver container, string name, params IResolveParameter[] parameters)
             where TResolveType : class
         {
             if (container.CanResolve<TResolveType>(name))
@@ -42,18 +42,15 @@ namespace CB.Ioc
             return default(TResolveType);
         }
 
-        public static TResolveType Resolve<TResolveType>(this IContainer container, params IResolveParameter[] parameters)
+        public static TResolveType Resolve<TResolveType>(this IScopeResolver container, params IResolveParameter[] parameters)
             where TResolveType : class
         {
             return Resolve<TResolveType>(container, null, parameters);
         }
 
-        public static IEnumerable<TResolveType> ResolveAll<TResolveType>(this IContainer container, params IResolveParameter[] parameters)
+        public static IEnumerable<TResolveType> ResolveAll<TResolveType>(this IScopeResolver container, params IResolveParameter[] parameters)
         {
-            foreach (var instance in container.ResolveAll(typeof (TResolveType), parameters))
-            {
-                yield return (TResolveType) instance;
-            }
+            return container.ResolveAll(typeof (TResolveType), parameters).Select(instance => (TResolveType) instance);
         }
 
         private class TmpRegisterTypeInfo
@@ -65,19 +62,19 @@ namespace CB.Ioc
         public static void RegisterTypes(this IContainerBuilder builder, bool forceTypeInjectionAttribute = true, params Type[] typesArray)
         {
             var types = from t in typesArray
-                        let attributes = t.GetCustomAttributes(typeof(TypeInjectionAttribute), false)
-                        where (!forceTypeInjectionAttribute) || (attributes != null && attributes.Any())
-                        select new TmpRegisterTypeInfo
-                        {
-                            Type = t,
-                            Attributes = attributes == null ? new TypeInjectionAttribute[0] : attributes.Cast<TypeInjectionAttribute>().ToArray()
-                        };
+                let attributes = t.GetCustomAttributes(typeof (TypeInjectionAttribute), false)
+                where (!forceTypeInjectionAttribute) || (attributes != null && attributes.Any())
+                select new TmpRegisterTypeInfo
+                {
+                    Type = t,
+                    Attributes = attributes == null ? new TypeInjectionAttribute[0] : attributes.Cast<TypeInjectionAttribute>().ToArray()
+                };
             foreach (var type in types)
             {
                 //if no RegisterInfo is specified, means register it self
                 if (type.Attributes == null || type.Attributes.Length <= 0)
                 {
-                    type.Attributes = new[] { new TypeInjectionAttribute() };
+                    type.Attributes = new[] {new TypeInjectionAttribute()};
                 }
 
                 foreach (var attribute in type.Attributes)
@@ -115,58 +112,52 @@ namespace CB.Ioc
             RegisterTypes(builder, forceTypeInjectionAttribute, assembly.GetTypes());
         }
 
-        public static bool TryResolve(this IContainer container, Type resolvedType, string name, out object instance, params IResolveParameter[] parameters)
+        public static bool TryResolve(this IScopeResolver container, Type resolvedType, string name, out object instance, params IResolveParameter[] parameters)
         {
             instance = null;
             if (!container.CanResolve(resolvedType, name))
             {
                 return false;
             }
-            if (string.IsNullOrEmpty(name))
-            {
-                instance = container.Resolve(resolvedType, parameters);
-            }
-            else
-            {
-                instance = container.Resolve(resolvedType, name, parameters);
-            }
+            instance = string.IsNullOrEmpty(name) ? container.Resolve(resolvedType, parameters) : container.Resolve(resolvedType, name, parameters);
             return true;
         }
 
-        public static bool TryResolve(this IContainer container, Type resolvedType, out object instance, params IResolveParameter[] parameters)
+        public static bool TryResolve(this IScopeResolver container, Type resolvedType, out object instance, params IResolveParameter[] parameters)
         {
             return TryResolve(container, resolvedType, null, out instance, parameters);
         }
 
-        public static bool TryResolve<T>(this IContainer container, string name, out T instance, params IResolveParameter[] parameters) where T : class
+        public static bool TryResolve<T>(this IScopeResolver container, string name, out T instance, params IResolveParameter[] parameters) where T : class
         {
             object obj;
             var result = TryResolve(container, typeof (T), name, out obj, parameters);
-            instance = (T)obj;
+            instance = (T) obj;
             return result;
         }
 
-        public static bool TryResolve<T>(this IContainer container, out T instance, params IResolveParameter[] parameters) where T : class
+        public static bool TryResolve<T>(this IScopeResolver container, out T instance, params IResolveParameter[] parameters) where T : class
         {
             return TryResolve(container, null, out instance, parameters);
         }
 
-        public static void PropertyInjection(this IContainer container, object instance, Type attributeType, Func<object, PropertyInfo, IEnumerable<object>, Type> overrideTypeResolveFunc)
+        public static void PropertyInjection(
+            this IScopeResolver container, object instance, Type attributeType, Func<object, PropertyInfo, IEnumerable<object>, Type> overrideTypeResolveFunc)
         {
-            if (!attributeType.IsSubclassOf(typeof(Attribute)))
+            if (!attributeType.IsSubclassOf(typeof (Attribute)))
             {
                 //ToDO Message
                 throw new ArgumentOutOfRangeException("", "attributeType");
             }
             var properties = from p in instance.GetType().GetProperties()
-                             where p.CanWrite && p.GetIndexParameters().Length <= 0
-                             let attributes = p.GetCustomAttributes(attributeType, true)
-                             where attributes.Length > 0
-                             select new
-                             {
-                                 PropertyInfo = p,
-                                 Attributes = attributes
-                             };
+                where p.CanWrite && p.GetIndexParameters().Length <= 0
+                let attributes = p.GetCustomAttributes(attributeType, true)
+                where attributes.Length > 0
+                select new
+                {
+                    PropertyInfo = p,
+                    Attributes = attributes
+                };
             foreach (var prop in properties)
             {
                 var value = prop.PropertyInfo.GetValue(instance, null);
@@ -183,8 +174,9 @@ namespace CB.Ioc
                 if (!prop.PropertyInfo.PropertyType.IsAssignableFrom(overrideTypeResolve))
                 {
                     throw new ArgumentException(
-                        string.Format("the return value of overrideTypeResolveFunc should be able to assigned to property {0}.{1}",
-                                      prop.PropertyInfo.Name, instance.GetType().FullName), "overrideTypeResolveFunc");
+                        string.Format(
+                            "the return value of overrideTypeResolveFunc should be able to assigned to property {0}.{1}",
+                            prop.PropertyInfo.Name, instance.GetType().FullName), "overrideTypeResolveFunc");
                 }
                 if (!TryResolve(container, overrideTypeResolve, out value))
                 {
@@ -197,14 +189,15 @@ namespace CB.Ioc
             }
         }
 
-        public static void PropertyInjection<TAttr>(this IContainer container, object instance,
-                                                       Func<object, PropertyInfo, IEnumerable<TAttr>, Type> overrideTypeResolveFunc)
+        public static void PropertyInjection<TAttr>(
+            this IScopeResolver container, object instance,
+            Func<object, PropertyInfo, IEnumerable<TAttr>, Type> overrideTypeResolveFunc)
             where TAttr : Attribute
         {
             PropertyInjection(
                 container, instance, typeof (TAttr),
                 (ins, propertyInfo, attributes) =>
-                overrideTypeResolveFunc(ins, propertyInfo, attributes.Cast<TAttr>()));
+                    overrideTypeResolveFunc(ins, propertyInfo, attributes.Cast<TAttr>()));
         }
 
         public static Type DefaultOverrideTypeResolveFunc(object instance, PropertyInfo propertyInfo, IEnumerable<DependencyAttribute> dependencyAttributes)

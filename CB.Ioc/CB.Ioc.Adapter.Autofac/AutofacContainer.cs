@@ -1,81 +1,31 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using Autofac;
-using Autofac.Core;
 
 namespace CB.Ioc.Adapter.Autofac
 {
-    public class AutofacContainer : IContainer
+    public class AutofacContainer : AutofacScopeResolver, IContainer
     {
-        public global::Autofac.IContainer ComponentContext { get; internal set; }
-
-        protected virtual void Dispose(bool disposing)
+        public virtual global::Autofac.IContainer ContainerContext
         {
-            if (disposing)
+            get { return (global::Autofac.IContainer) ComponentContext; }
+            internal set { ComponentContext = value; }
+        }
+
+        #region Overrides of AutofacScopeResolver
+
+        public override ILifetimeScope ComponentContext
+        {
+            get { return base.ComponentContext; }
+            internal set
             {
-                if (ComponentContext != null)
+                if (value != null && (!(value is global::Autofac.IContainer)))
                 {
-                    ComponentContext.Dispose();
+                    throw new ArgumentException("ComponentContext should be Autofac.IContainer", "value");
                 }
+                base.ComponentContext = value;
             }
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        ~AutofacContainer()
-        {
-            Dispose(false);
-        }
-
-        public object Resolve(Type resolveType, string name, params IResolveParameter[] parameters)
-        {
-            object instance;
-            var @params = parameters.Select(p => (Parameter) new AutofacResolvedParameter(p)).ToArray();
-            if (string.IsNullOrEmpty(name))
-            {
-                instance = ComponentContext.Resolve(resolveType, @params);
-            }
-            else
-            {
-                instance = ComponentContext.ResolveNamed(name, resolveType, @params);
-            }
-            BuildUp(instance);
-            return instance;
-        }
-
-        public object Resolve(Type resolveType, params IResolveParameter[] parameters)
-        {
-            return Resolve(resolveType, null, parameters);
-        }
-
-        public IEnumerable<object> ResolveAll(Type resolveType, params IResolveParameter[] parameters)
-        {
-            var type = typeof(IEnumerable<>);
-            var @params = parameters.Select(p => (Parameter)new AutofacResolvedParameter(p)).ToArray();
-            foreach (var instance in (IEnumerable) ComponentContext.Resolve(type.MakeGenericType(resolveType), @params))
-            {
-                BuildUp(instance);
-                yield return instance;
-            }
-        }
-
-        public bool CanResolve(Type resolveType, string name = null)
-        {
-            return string.IsNullOrEmpty(name) ? ComponentContext.IsRegistered(resolveType) : ComponentContext.IsRegisteredWithName(name, resolveType);
-        }
-
-        public virtual void BuildUp(object resolvedInstance)
-        {
-            //although we have already register property injection this on "OnActived" of AutofacRegisterOption
-            //but we have do it again for some case that user directly build up an existing instance
-            //and as property injection won't inject for a property that have value so it is ok to run this twice
-            this.PropertyInjection<DependencyAttribute>(resolvedInstance, IoCExtension.DefaultOverrideTypeResolveFunc);
-        }
+        #endregion
     }
 }
