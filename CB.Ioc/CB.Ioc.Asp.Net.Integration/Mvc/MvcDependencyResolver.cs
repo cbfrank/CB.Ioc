@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Web.Mvc;
 
 namespace CB.Ioc.Mvc
@@ -17,12 +15,18 @@ namespace CB.Ioc.Mvc
 
         public object GetService(Type serviceType)
         {
-            return Container.Resolve(serviceType);
+            object service;
+            Container.TryResolve(serviceType, out service);
+            return service;
         }
 
         public IEnumerable<object> GetServices(Type serviceType)
         {
-            return Container.ResolveAll(serviceType);
+            if (Container.CanResolve(serviceType))
+            {
+                return Container.ResolveAll(serviceType);
+            }
+            return new object[0];
         }
     }
 }
