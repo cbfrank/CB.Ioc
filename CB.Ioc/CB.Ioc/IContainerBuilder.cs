@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CB.Ioc
 {
@@ -13,7 +14,7 @@ namespace CB.Ioc
         /// </summary>
         /// <param name="creationFunction">second is the resolve parameter, the result is the instance</param>
         /// <returns></returns>
-        IRegisterOption Register<TImplementationType>(Func<IContainer, object, TImplementationType> creationFunction);
+        IRegisterOption Register<TImplementationType>(Func<IContainer, IEnumerable<IResolveParameter>, TImplementationType> creationFunction);
         
         IContainer BuildContainer();
 

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Autofac;
 using Autofac.Builder;
+using Autofac.Core;
 
 namespace CB.Ioc.Adapter.Autofac
 {
@@ -21,7 +24,12 @@ namespace CB.Ioc.Adapter.Autofac
 
         public IRegisterOption Register(Type implementationType)
         {
-            return new AutofacRegisterOption<object, ConcreteReflectionActivatorData, SingleRegistrationStyle>(Builder.RegisterType(implementationType), implementationType);
+            if (implementationType.IsGenericTypeDefinition)
+            {
+                return new AutofacRegisterOption<object, ReflectionActivatorData, DynamicRegistrationStyle>(Builder.RegisterGeneric(implementationType), implementationType);
+            }
+            else
+                return new AutofacRegisterOption<object, ConcreteReflectionActivatorData, SingleRegistrationStyle>(Builder.RegisterType(implementationType), implementationType);
         }
 
         public IRegisterOption Register(object instance)
@@ -29,11 +37,16 @@ namespace CB.Ioc.Adapter.Autofac
             return new AutofacRegisterOption<object, SimpleActivatorData, SingleRegistrationStyle>(Builder.RegisterInstance(instance), instance.GetType());
         }
 
-        public IRegisterOption Register<TImplementationType>(Func<IContainer, object, TImplementationType> creationFunction)
+        public IRegisterOption Register<TImplementationType>(Func<IContainer, IEnumerable<IResolveParameter>, TImplementationType> creationFunction)
         {
             return
                 new AutofacRegisterOption<TImplementationType, SimpleActivatorData, SingleRegistrationStyle>(
-                    Builder.Register((context, parameters) => creationFunction(context.Resolve<IContainer>(), parameters)), typeof(TImplementationType));
+                    Builder.Register(
+                        (context, parameters) =>
+                        {
+                            var enumerable = parameters as Parameter[] ?? parameters.ToArray();
+                            return creationFunction(context.Resolve<IContainer>(), enumerable.Select(p => new AutofacParameterWrapper(p)));
+                        }), typeof (TImplementationType));
         }
 
         public IContainer BuildContainer()

@@ -37,6 +37,7 @@
   <ItemGroup>
     <Compile Include="AutofacBuilder.cs" />
     <Compile Include="AutofacContainer.cs" />
+    <Compile Include="AutofacParameterWrapper.cs" />
     <Compile Include="AutofacRegisterOption.cs" />
     <Compile Include="AutofacResolvedParameter.cs" />
     <Compile Include="AutofacScopeResolver.cs" />
