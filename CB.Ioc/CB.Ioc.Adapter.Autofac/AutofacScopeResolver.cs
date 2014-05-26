@@ -36,7 +36,19 @@ namespace CB.Ioc.Adapter.Autofac
         public virtual object Resolve(Type resolveType, string name, params IResolveParameter[] parameters)
         {
             var @params = parameters.Select(p => (Parameter) new AutofacResolvedParameter(p)).ToArray();
-            var instance = string.IsNullOrEmpty(name) ? ComponentContext.Resolve(resolveType, @params) : ComponentContext.ResolveNamed(name, resolveType, @params);
+            object instance;
+            /*if (resolveType == typeof (IScopeResolver))
+            {
+                instance = string.IsNullOrEmpty(name) ? ComponentContext.Resolve<ILifetimeScope>(@params) : ComponentContext.ResolveNamed<ILifetimeScope>(name, @params);
+                instance = new AutofacScopeResolver()
+                {
+                    ComponentContext = (ILifetimeScope) instance
+                };
+            }
+            else*/
+            {
+                instance = string.IsNullOrEmpty(name) ? ComponentContext.Resolve(resolveType, @params) : ComponentContext.ResolveNamed(name, resolveType, @params);
+            }
             BuildUp(instance);
             return instance;
         }
@@ -64,18 +76,19 @@ namespace CB.Ioc.Adapter.Autofac
 
         public IScopeResolver BeginLifetimeScope()
         {
-            return new AutofacScopeResolver
-            {
-                ComponentContext = ComponentContext.BeginLifetimeScope()
-            };
+            var scope = new AutofacScopeResolver();
+            scope.ComponentContext = ComponentContext.BeginLifetimeScope(
+                builder => builder.Register<IScopeResolver>(context => scope));
+            return scope;
         }
 
         public IScopeResolver BeginLifetimeScope(object tag)
         {
-            return new AutofacScopeResolver
-            {
-                ComponentContext = ComponentContext.BeginLifetimeScope(tag)
-            };
+            var scope = new AutofacScopeResolver();
+            scope.ComponentContext = ComponentContext.BeginLifetimeScope(
+                tag,
+                builder => builder.Register<IScopeResolver>(context => scope));
+            return scope;
         }
 
         public virtual void BuildUp(object resolvedInstance)

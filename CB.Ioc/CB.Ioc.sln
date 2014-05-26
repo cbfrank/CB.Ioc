@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{BA5CFA4F-315C-41A2-87E3-270CA2A109FF}"
 	ProjectSection(SolutionItems) = preProject
@@ -15,6 +15,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CB.Ioc.Adapter.Autofac", "CB.Ioc.Adapter.Autofac\CB.Ioc.Adapter.Autofac.csproj", "{70653AFC-3E46-497B-8FEA-020CD23F9023}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CB.Ioc.Asp.Net.Integration", "CB.Ioc.Asp.Net.Integration\CB.Ioc.Asp.Net.Integration.csproj", "{C6032995-9953-444F-9D9D-CD09D0A7E231}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CB.Ioc.Examine", "CB.Ioc.Examine\CB.Ioc.Examine.csproj", "{533DCC0B-EF9E-4F7A-88F8-F2E23C1DFCB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +36,10 @@ Global
 		{C6032995-9953-444F-9D9D-CD09D0A7E231}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6032995-9953-444F-9D9D-CD09D0A7E231}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6032995-9953-444F-9D9D-CD09D0A7E231}.Release|Any CPU.Build.0 = Release|Any CPU
+		{533DCC0B-EF9E-4F7A-88F8-F2E23C1DFCB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{533DCC0B-EF9E-4F7A-88F8-F2E23C1DFCB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{533DCC0B-EF9E-4F7A-88F8-F2E23C1DFCB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{533DCC0B-EF9E-4F7A-88F8-F2E23C1DFCB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

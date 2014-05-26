@@ -53,7 +53,10 @@ namespace CB.Ioc.Adapter.Autofac
         {
             var c= new AutofacContainer();
             Builder.RegisterInstance(c).As<IContainer>();
+            var rootScope = new AutofacScopeResolver();
+            Builder.RegisterInstance(rootScope).As<IScopeResolver>();
             c.ContainerContext = Builder.Build();
+            rootScope.ComponentContext = c.ContainerContext.Resolve<ILifetimeScope>();
             return c;
         }
 
