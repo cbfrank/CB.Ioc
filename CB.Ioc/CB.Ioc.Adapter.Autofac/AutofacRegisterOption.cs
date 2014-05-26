@@ -30,10 +30,21 @@ namespace CB.Ioc.Adapter.Autofac
         {
             if (_Singleton.HasValue)
             {
-                throw new InvalidOperationException("Can NOT invoke AsSingleton or AsMultiInstance twice");
+                throw new InvalidOperationException("Can NOT invoke AsSingleton, AsMultiInstance or SingletonPerLifetimeScope twice");
             }
             _Singleton = true;
             FRegistrationBuilder = FRegistrationBuilder.SingleInstance();
+            return this;
+        }
+
+        public IRegisterOption SingletonPerLifetimeScope()
+        {
+            if (_Singleton.HasValue)
+            {
+                throw new InvalidOperationException("Can NOT invoke AsSingleton, AsMultiInstance or SingletonPerLifetimeScope twice");
+            }
+            _Singleton = true;
+            FRegistrationBuilder = FRegistrationBuilder.InstancePerLifetimeScope();
             return this;
         }
 
@@ -41,7 +52,7 @@ namespace CB.Ioc.Adapter.Autofac
         {
             if (_Singleton.HasValue)
             {
-                throw new InvalidOperationException("Can NOT invoke AsSingleton or AsMultiInstance twice");
+                throw new InvalidOperationException("Can NOT invoke AsSingleton, AsMultiInstance or SingletonPerLifetimeScope ");
             }
             _Singleton = false;
             return this;
