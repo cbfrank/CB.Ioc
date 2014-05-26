@@ -7,11 +7,18 @@ namespace CB.Ioc
     {
         public TypeInjectionAttribute()
         {
-            SingleInstance = false;
+            SingleInstance = SingleInstance.None;
         }
 
         public string Name { get; set; }
         public Type AsType { get; set; }
-        public bool SingleInstance { get; set; }
+        public SingleInstance SingleInstance { get; set; }
+    }
+
+    public enum SingleInstance
+    {
+        None,
+        SingleInstance,
+        SingletonPerLifetimeScope
     }
 }

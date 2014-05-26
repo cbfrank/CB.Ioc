@@ -92,9 +92,18 @@ namespace CB.Ioc
                             reg = reg.Name(attribute.Name);
                         }
 
-                        if (attribute.SingleInstance)
+                        switch (attribute.SingleInstance)
                         {
-                            reg.AsSingleton();
+                            case SingleInstance.None:
+                                break;
+                            case SingleInstance.SingleInstance:
+                                reg.AsSingleton();
+                                break;
+                            case SingleInstance.SingletonPerLifetimeScope:
+                                reg.SingletonPerLifetimeScope();
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
                         }
                     }
                 }
