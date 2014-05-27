@@ -8,6 +8,6 @@ namespace CB.Ioc
 {
     public interface IResolveParameter
     {
-        bool CanSupplyValue(ParameterInfo pi, IContainer context, out Func<object> valueProvider);
+        bool CanSupplyValue(ParameterInfo pi, IScopeResolver context, out Func<object> valueProvider);
     }
 }

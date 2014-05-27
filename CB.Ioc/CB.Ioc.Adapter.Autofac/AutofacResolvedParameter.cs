@@ -19,7 +19,7 @@ namespace CB.Ioc.Adapter.Autofac
 
         public override bool CanSupplyValue(ParameterInfo pi, IComponentContext context, out Func<object> valueProvider)
         {
-            return ResolveParameter.CanSupplyValue(pi, context.Resolve<IContainer>(), out valueProvider);
+            return ResolveParameter.CanSupplyValue(pi, context.Resolve<IScopeResolver>(), out valueProvider);
         }
     }
 }

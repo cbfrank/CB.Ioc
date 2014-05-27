@@ -19,7 +19,7 @@ namespace CB.Ioc.Adapter.Autofac
 
         private static void ActivedHandler(IActivatedEventArgs<TLimit> activatedEventArgs)
         {
-            activatedEventArgs.Context.Resolve<IContainer>().PropertyInjection<DependencyAttribute>(activatedEventArgs.Instance, IoCExtension.DefaultOverrideTypeResolveFunc);
+            activatedEventArgs.Context.Resolve<IScopeResolver>().PropertyInjection<DependencyAttribute>(activatedEventArgs.Instance, IoCExtension.DefaultOverrideTypeResolveFunc);
         }
 
         protected IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> FRegistrationBuilder;

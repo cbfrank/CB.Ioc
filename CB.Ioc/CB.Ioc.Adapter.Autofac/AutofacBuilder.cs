@@ -37,7 +37,7 @@ namespace CB.Ioc.Adapter.Autofac
             return new AutofacRegisterOption<object, SimpleActivatorData, SingleRegistrationStyle>(Builder.RegisterInstance(instance), instance.GetType());
         }
 
-        public IRegisterOption Register<TImplementationType>(Func<IContainer, IEnumerable<IResolveParameter>, TImplementationType> creationFunction)
+        public IRegisterOption Register<TImplementationType>(Func<IScopeResolver, IEnumerable<IResolveParameter>, TImplementationType> creationFunction)
         {
             return
                 new AutofacRegisterOption<TImplementationType, SimpleActivatorData, SingleRegistrationStyle>(
@@ -45,14 +45,16 @@ namespace CB.Ioc.Adapter.Autofac
                         (context, parameters) =>
                         {
                             var enumerable = parameters as Parameter[] ?? parameters.ToArray();
-                            return creationFunction(context.Resolve<IContainer>(), enumerable.Select(p => new AutofacParameterWrapper(p)));
+                            var container = context.Resolve<IScopeResolver>() ?? context.Resolve<IContainer>();
+                            return creationFunction(container, enumerable.Select(p => new AutofacParameterWrapper(p)));
                         }), typeof (TImplementationType));
         }
 
         public IContainer BuildContainer()
         {
             var c= new AutofacContainer();
-            Builder.RegisterInstance(c).As<IContainer>();
+            //remove the auto register of IContainer, user should always try to resolve the IScopeResolver not the IContainer to make it always get the correct scope
+            //Builder.RegisterInstance(c).As<IContainer>();
             var rootScope = new AutofacScopeResolver();
             Builder.RegisterInstance(rootScope).As<IScopeResolver>();
             c.ContainerContext = Builder.Build();

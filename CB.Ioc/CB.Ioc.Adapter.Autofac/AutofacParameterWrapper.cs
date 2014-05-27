@@ -18,7 +18,7 @@ namespace CB.Ioc.Adapter.Autofac
 
         #region Implementation of IResolveParameter
 
-        public bool CanSupplyValue(ParameterInfo pi, IContainer context, out Func<object> valueProvider)
+        public bool CanSupplyValue(ParameterInfo pi, IScopeResolver context, out Func<object> valueProvider)
         {
             var autofacContainer = context as AutofacScopeResolver;
             if (autofacContainer == null)

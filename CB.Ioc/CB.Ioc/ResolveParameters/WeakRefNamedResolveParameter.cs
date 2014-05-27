@@ -14,7 +14,7 @@ namespace CB.Ioc
         public string Name { get; private set; }
         public WeakReference Value { get; private set; }
 
-        public bool CanSupplyValue(ParameterInfo pi, IContainer context, out Func<object> valueProvider)
+        public bool CanSupplyValue(ParameterInfo pi, IScopeResolver context, out Func<object> valueProvider)
         {
             valueProvider = null;
             if (pi.Name == Name)
