@@ -51,6 +51,7 @@
     <Compile Include="ResolveParameters\NamedResolveParameter.cs" />
     <Compile Include="ResolveParameters\WeakRefNamedResolveParameter.cs" />
     <Compile Include="TypeInjectionAttribute.cs" />
+    <Compile Include="TypeInjectionByMethodAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

@@ -58,8 +58,29 @@ namespace CB.Ioc
             public Type Type { get; set; }
             public TypeInjectionAttribute[] Attributes { get; set; }
         }
-
         public static void RegisterTypes(this IContainerBuilder builder, bool forceTypeInjectionAttribute = true, params Type[] typesArray)
+        {
+            RegisterTypesWithTypeInjectionAttribute(builder, forceTypeInjectionAttribute, typesArray);
+            RegisterTypesWithTypeInjectionByMethodAttribute(builder, typesArray);
+        }
+
+        private static void RegisterTypesWithTypeInjectionByMethodAttribute(this IContainerBuilder builder, params Type[] typesArray)
+        {
+            var methods = from m in typesArray.SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Static))
+                let attributes = m.GetCustomAttributes(typeof (TypeInjectionByMethodAttribute), false)
+                where attributes != null && attributes.Any() && !m.IsAbstract
+                select m;
+            foreach (var methodInfo in methods)
+            {
+                var parameters = methodInfo.GetParameters();
+                if (parameters.Length == 1 && parameters[0].ParameterType.IsInstanceOfType(builder))
+                {
+                    methodInfo.Invoke(null, new object[] {builder});
+                }
+            }
+        }
+
+        private static void RegisterTypesWithTypeInjectionAttribute(this IContainerBuilder builder, bool forceTypeInjectionAttribute = true, params Type[] typesArray)
         {
             var types = from t in typesArray
                 let attributes = t.GetCustomAttributes(typeof (TypeInjectionAttribute), false)
