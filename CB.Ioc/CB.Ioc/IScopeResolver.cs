@@ -16,6 +16,8 @@ namespace CB.Ioc
         IScopeResolver BeginLifetimeScope();
 
         IScopeResolver BeginLifetimeScope(object tag);
+
+        IScopeResolver BeginLifetimeScope(Action<IContainerBuilder> configurationAction);
         
         void BuildUp(object resolvedInstance);
     }

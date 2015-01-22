@@ -76,10 +76,7 @@ namespace CB.Ioc.Adapter.Autofac
 
         public IScopeResolver BeginLifetimeScope()
         {
-            var scope = new AutofacScopeResolver();
-            scope.ComponentContext = ComponentContext.BeginLifetimeScope(
-                builder => builder.Register<IScopeResolver>(context => scope));
-            return scope;
+            return BeginLifetimeScope(builder => { });
         }
 
         public IScopeResolver BeginLifetimeScope(object tag)
@@ -88,6 +85,19 @@ namespace CB.Ioc.Adapter.Autofac
             scope.ComponentContext = ComponentContext.BeginLifetimeScope(
                 tag,
                 builder => builder.Register<IScopeResolver>(context => scope));
+            return scope;
+        }
+
+        public IScopeResolver BeginLifetimeScope(Action<IContainerBuilder> configurationAction)
+        {
+            var scope = new AutofacScopeResolver();
+            scope.ComponentContext = ComponentContext.BeginLifetimeScope(
+                builder =>
+                {
+                    var containerBuilder = new AutofacBuilder(builder);
+                    configurationAction(containerBuilder);
+                    builder.Register<IScopeResolver>(context => scope);
+                });
             return scope;
         }
 
