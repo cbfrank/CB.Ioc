@@ -55,10 +55,10 @@ namespace CB.Ioc.Adapter.Autofac
             var c= new AutofacContainer();
             //remove the auto register of IContainer, user should always try to resolve the IScopeResolver not the IContainer to make it always get the correct scope
             //Builder.RegisterInstance(c).As<IContainer>();
-            var rootScope = new AutofacScopeResolver();
-            Builder.RegisterInstance(rootScope).As<IScopeResolver>();
+            //var rootScope = new AutofacScopeResolver();
+            Builder.RegisterInstance(c).As<IScopeResolver>();
             c.ContainerContext = Builder.Build();
-            rootScope.ComponentContext = c.ContainerContext.Resolve<ILifetimeScope>();
+            //c.ComponentContext = c.ContainerContext.Resolve<ILifetimeScope>();
             return c;
         }
 

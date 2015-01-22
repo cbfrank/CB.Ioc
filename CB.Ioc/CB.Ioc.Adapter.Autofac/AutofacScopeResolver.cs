@@ -9,6 +9,12 @@ namespace CB.Ioc.Adapter.Autofac
 {
     public class AutofacScopeResolver : IScopeResolver
     {
+        public AutofacScopeResolver()
+        {
+            Id = Guid.NewGuid();
+        }
+
+        public Guid Id { get; private set; }
         public virtual ILifetimeScope ComponentContext { get; internal set; }
 
         protected virtual void Dispose(bool disposing)
